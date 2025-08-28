@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lumeo - AI Video Generation Platform
 
-## Getting Started
+A beautiful Next.js application that harnesses the power of Google's Gemini Veo SDK to create stunning AI-generated videos with an electric Swiss summertime space aesthetic.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **AI Video Generation**: Powered by Google Gemini Veo SDK
+- **Electric Swiss Summertime Space Design**: Unique aesthetic combining Swiss minimalism with cosmic energy
+- **Real-time Processing**: Live status updates during video generation
+- **Responsive Design**: Works beautifully on all devices
+- **Modern Tech Stack**: Next.js 15, TypeScript, Tailwind CSS
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18 or later
+- Google AI Studio API key
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone and install dependencies:**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Set up environment variables:**
+   Create a `.env.local` file in the root directory:
+   ```env
+   GOOGLE_API_KEY=your_google_ai_api_key_here
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Get your API key:**
+   - Visit [Google AI Studio](https://ai.google.dev/)
+   - Create an account and generate an API key
+   - Add it to your `.env.local` file
 
-## Deploy on Vercel
+4. **Install additional dependencies:**
+   ```bash
+   npm install @google/genai
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. **Open your browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🎨 Design Philosophy
+
+Our "Electric Swiss Summertime Space" aesthetic combines:
+
+- **Swiss Design Principles**: Clean typography, minimal layouts, precise spacing
+- **Electric Energy**: Vibrant blues, cosmic pinks, and neon accents
+- **Summer Vibes**: Warm gradients and energetic animations
+- **Space Elements**: Floating particles, cosmic backgrounds, and stellar effects
+
+### Color Palette
+
+- **Electric Blue**: `#00d4ff` - Primary accent and energy
+- **Space Purple**: `#6a0dad` - Depth and cosmic mystery  
+- **Summer Cyan**: `#40e0d0` - Fresh, summery highlights
+- **Neon Yellow**: `#ffff00` - Electric energy and emphasis
+- **Cosmic Pink**: `#ff1493` - Playful cosmic elements
+- **Stellar White**: `#ffffff` - Clean, crisp text
+- **Void Black**: `#000000` - Deep space backgrounds
+
+## 🛠️ Project Structure

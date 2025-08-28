@@ -1,26 +1,148 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Electric Swiss Summertime Space Color Palette */
+  --electric-blue: #00d4ff;
+  --space-purple: #6a0dad;
+  --summer-cyan: #40e0d0;
+  --neon-yellow: #ffff00;
+  --cosmic-pink: #ff1493;
+  --stellar-white: #ffffff;
+  --void-black: #000000;
+  --nebula-gray: #2a2a2a;
+  
+  --background: var(--void-black);
+  --foreground: var(--stellar-white);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+  }
+  
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom utilities for the electric Swiss space theme */
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+
+  .border-glow {
+    box-shadow: 0 0 15px currentColor;
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .bg-electric-blue {
+    background-color: var(--electric-blue);
+  }
+
+  .bg-space-purple {
+    background-color: var(--space-purple);
+  }
+
+  .bg-summer-cyan {
+    background-color: var(--summer-cyan);
+  }
+
+  .bg-neon-yellow {
+    background-color: var(--neon-yellow);
+  }
+
+  .bg-cosmic-pink {
+    background-color: var(--cosmic-pink);
+  }
+
+  .bg-stellar-white {
+    background-color: var(--stellar-white);
+  }
+
+  .bg-void-black {
+    background-color: var(--void-black);
+  }
+
+  .bg-nebula-gray {
+    background-color: var(--nebula-gray);
+  }
+
+  .text-electric-blue {
+    color: var(--electric-blue);
+  }
+
+  .text-space-purple {
+    color: var(--space-purple);
+  }
+
+  .text-summer-cyan {
+    color: var(--summer-cyan);
+  }
+
+  .text-neon-yellow {
+    color: var(--neon-yellow);
+  }
+
+  .text-cosmic-pink {
+    color: var(--cosmic-pink);
+  }
+
+  .text-stellar-white {
+    color: var(--stellar-white);
+  }
+
+  .text-void-black {
+    color: var(--void-black);
+  }
+
+  .text-nebula-gray {
+    color: var(--nebula-gray);
+  }
+
+  .border-electric-blue {
+    border-color: var(--electric-blue);
+  }
+
+  .border-space-purple {
+    border-color: var(--space-purple);
+  }
+
+  .border-summer-cyan {
+    border-color: var(--summer-cyan);
+  }
+
+  .border-cosmic-pink {
+    border-color: var(--cosmic-pink);
+  }
+
+  /* Animation utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+}
+
+/* Animation keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
