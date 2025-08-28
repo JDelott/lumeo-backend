@@ -1,14 +1,55 @@
 'use client';
 
-import { useState } from 'react';
-import { Send, Sparkles, Video, Loader2, Zap, Download, CheckCircle } from 'lucide-react';
-import { VideoGenerationResponse } from '@/lib/types';
+import { useState, useRef } from 'react';
+import { Send, Sparkles, Video, Loader2, Zap, Download, CheckCircle, Upload, Image, Type } from 'lucide-react';
+import NextImage from 'next/image';
+import { VideoGenerationResponse, VideoGenerationRequest } from '@/lib/types';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<VideoGenerationResponse | null>(null);
   const [error, setError] = useState('');
+  const [generationType, setGenerationType] = useState<'text-to-video' | 'image-to-video'>('text-to-video');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image file must be less than 10MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        // Convert to base64 without data URL prefix for API
+        const base64 = result.split(',')[1];
+        setSelectedImage(base64);
+        setError('');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,17 +59,31 @@ export default function Home() {
       return;
     }
 
+    if (generationType === 'image-to-video' && !selectedImage) {
+      setError('Please upload an image for image-to-video generation');
+      return;
+    }
+
     setIsGenerating(true);
     setError('');
     setResult(null);
 
     try {
+      const requestBody: VideoGenerationRequest = {
+        prompt,
+        generationType,
+      };
+
+      if (generationType === 'image-to-video' && selectedImage) {
+        requestBody.image = selectedImage;
+      }
+
       const response = await fetch('/api/generate-video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify(requestBody),
       });
 
       const data: VideoGenerationResponse = await response.json();
@@ -89,19 +144,105 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Generation Type Selection */}
+        <div className="glass-effect rounded-3xl p-6 mb-8 border-glow border-electric-blue/30">
+          <h3 className="text-lg font-semibold text-stellar-white mb-4 text-center">Choose Generation Type</h3>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => {
+                setGenerationType('text-to-video');
+                clearImage();
+              }}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                generationType === 'text-to-video'
+                  ? 'bg-gradient-to-r from-electric-blue to-cosmic-pink text-stellar-white border-2 border-electric-blue/50'
+                  : 'bg-nebula-gray/30 text-stellar-white/70 hover:bg-nebula-gray/50'
+              }`}
+            >
+              <Type className="w-5 h-5" />
+              Text to Video
+            </button>
+            <button
+              onClick={() => setGenerationType('image-to-video')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                generationType === 'image-to-video'
+                  ? 'bg-gradient-to-r from-electric-blue to-cosmic-pink text-stellar-white border-2 border-electric-blue/50'
+                  : 'bg-nebula-gray/30 text-stellar-white/70 hover:bg-nebula-gray/50'
+              }`}
+            >
+              <Image className="w-5 h-5" aria-label="Image icon" />
+              Image to Video
+            </button>
+          </div>
+        </div>
+
         {/* Main Form */}
         <div className="glass-effect rounded-3xl p-8 mb-8 border-glow border-electric-blue/30">
           <form onSubmit={handleGenerate} className="space-y-6">
+            {/* Image Upload Section for Image-to-Video */}
+            {generationType === 'image-to-video' && (
+              <div>
+                <label className="block text-lg font-medium text-stellar-white mb-3">
+                  Upload Source Image
+                </label>
+                <div className="space-y-4">
+                  {!imagePreview ? (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-electric-blue/50 rounded-xl p-8 text-center cursor-pointer hover:border-electric-blue transition-all duration-300 hover:bg-electric-blue/5"
+                    >
+                      <Upload className="w-12 h-12 text-electric-blue mx-auto mb-4" />
+                      <p className="text-stellar-white/80 mb-2">Click to upload an image</p>
+                      <p className="text-stellar-white/50 text-sm">Supports JPG, PNG, WebP (max 10MB)</p>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <NextImage
+                        src={imagePreview}
+                        alt="Uploaded preview"
+                        width={500}
+                        height={300}
+                        className="w-full max-h-64 object-contain rounded-xl border-2 border-electric-blue/50"
+                        unoptimized
+                      />
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        className="absolute top-2 right-2 bg-cosmic-pink text-stellar-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-cosmic-pink/80 transition-colors"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Prompt Section */}
             <div>
               <label htmlFor="prompt" className="block text-lg font-medium text-stellar-white mb-3">
-                Describe your video vision
+                {generationType === 'image-to-video' 
+                  ? 'Describe the motion you want to add'
+                  : 'Describe your video vision'
+                }
               </label>
               <div className="relative">
                 <textarea
                   id="prompt"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="A serene mountain lake at sunset with floating geometric shapes, or a futuristic cityscape with glowing neon lights dancing in the sky..."
+                  placeholder={
+                    generationType === 'image-to-video'
+                      ? "Camera pans to the right, gentle breeze moves the leaves, add floating particles..."
+                      : "A serene mountain lake at sunset with floating geometric shapes, or a futuristic cityscape with glowing neon lights dancing in the sky..."
+                  }
                   className="w-full h-32 px-4 py-3 bg-nebula-gray/50 border-2 border-electric-blue/30 rounded-xl text-stellar-white placeholder-stellar-white/50 focus:border-electric-blue focus:outline-none transition-all duration-300 resize-none"
                   disabled={isGenerating}
                 />
@@ -113,7 +254,7 @@ export default function Home() {
 
             <button
               type="submit"
-              disabled={isGenerating || !prompt.trim()}
+              disabled={isGenerating || !prompt.trim() || (generationType === 'image-to-video' && !selectedImage)}
               className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-electric-blue via-space-purple to-cosmic-pink text-stellar-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed border-glow border-electric-blue/50"
             >
               {isGenerating ? (
@@ -146,8 +287,24 @@ export default function Home() {
               Your Video is Ready!
             </h3>
             <div className="space-y-4 text-stellar-white">
+              <p><strong>Generation Type:</strong> <span className="text-summer-cyan capitalize">{result.generationType || 'text-to-video'}</span></p>
               <p><strong>Your Prompt:</strong> {result.prompt}</p>
               <p><strong>Status:</strong> <span className="text-neon-yellow capitalize">{result.status}</span></p>
+              
+              {/* Show input image for image-to-video */}
+              {result.generationType === 'image-to-video' && result.inputImage && (
+                <div className="mt-4">
+                  <p><strong>Source Image:</strong></p>
+                  <NextImage
+                    src={`data:image/jpeg;base64,${result.inputImage}`}
+                    alt="Source image used for video generation"
+                    width={500}
+                    height={200}
+                    className="w-full max-h-48 object-contain rounded-xl border-2 border-electric-blue/50 mt-2"
+                    unoptimized
+                  />
+                </div>
+              )}
               
               {result.videoUrl ? (
                 <div className="mt-6 space-y-4">
