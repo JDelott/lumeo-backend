@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Sparkles, Video, Loader2, Zap } from 'lucide-react';
+import { Send, Sparkles, Video, Loader2, Zap, Download, CheckCircle } from 'lucide-react';
 import { VideoGenerationResponse } from '@/lib/types';
 
 export default function Home() {
@@ -45,6 +45,22 @@ export default function Home() {
     }
   };
 
+  const downloadVideo = async (videoUrl: string) => {
+    try {
+      // Create a link element and trigger download
+      const link = document.createElement('a');
+      link.href = videoUrl;
+      link.download = `lumeo-video-${Date.now()}.mp4`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Download failed:', err);
+      setError('Failed to download video. Please try right-clicking the video and saving it.');
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden">
       {/* Animated background elements */}
@@ -67,9 +83,9 @@ export default function Home() {
           </div>
           
           <p className="text-xl text-stellar-white/80 max-w-2xl mx-auto leading-relaxed">
-            Create stunning AI-generated videos with the power of{' '}
-            <span className="text-electric-blue font-semibold">Gemini Veo</span>
-            {' '}in an electric Swiss summertime space aesthetic
+            Transform your imagination into stunning AI-generated videos.{' '}
+            <span className="text-electric-blue font-semibold">Powered by Gemini Veo</span>
+            {' '}— where creativity meets cutting-edge technology.
           </p>
         </div>
 
@@ -85,7 +101,7 @@ export default function Home() {
                   id="prompt"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="A futuristic Swiss mountain landscape bathed in electric blue aurora light, with sleek spacecraft hovering above crystalline peaks under a starry summer sky..."
+                  placeholder="A serene mountain lake at sunset with floating geometric shapes, or a futuristic cityscape with glowing neon lights dancing in the sky..."
                   className="w-full h-32 px-4 py-3 bg-nebula-gray/50 border-2 border-electric-blue/30 rounded-xl text-stellar-white placeholder-stellar-white/50 focus:border-electric-blue focus:outline-none transition-all duration-300 resize-none"
                   disabled={isGenerating}
                 />
@@ -103,12 +119,12 @@ export default function Home() {
               {isGenerating ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  Generating Magic...
+                  Creating Your Video... (2-3 minutes)
                 </>
               ) : (
                 <>
                   <Send className="w-6 h-6" />
-                  Create Video
+                  Generate Video
                 </>
               )}
             </button>
@@ -125,29 +141,47 @@ export default function Home() {
         {/* Result Display */}
         {result && (
           <div className="glass-effect rounded-3xl p-8 border-glow border-summer-cyan/30">
-            <h3 className="text-2xl font-bold text-summer-cyan mb-4 text-center">
-              ✨ Generation Status
+            <h3 className="text-2xl font-bold text-summer-cyan mb-4 text-center flex items-center justify-center gap-2">
+              <CheckCircle className="w-6 h-6" />
+              Your Video is Ready!
             </h3>
             <div className="space-y-4 text-stellar-white">
-              <p><strong>Prompt:</strong> {result.prompt}</p>
-              <p><strong>Status:</strong> <span className="text-neon-yellow">{result.status}</span></p>
-              <p><strong>Estimated Time:</strong> {result.estimatedTime}</p>
+              <p><strong>Your Prompt:</strong> {result.prompt}</p>
+              <p><strong>Status:</strong> <span className="text-neon-yellow capitalize">{result.status}</span></p>
               
               {result.videoUrl ? (
-                <div className="mt-6">
+                <div className="mt-6 space-y-4">
                   <video 
                     controls 
                     className="w-full rounded-xl border-2 border-electric-blue/50"
                     src={result.videoUrl}
+                    preload="metadata"
                   >
                     Your browser does not support video playback.
                   </video>
+                  <div className="flex gap-4 justify-center">
+                    <button
+                      onClick={() => downloadVideo(result.videoUrl!)}
+                      className="flex items-center justify-center gap-2 bg-gradient-to-r from-summer-cyan to-electric-blue text-void-black font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105"
+                    >
+                      <Download className="w-5 h-5" />
+                      Download Video
+                    </button>
+                    <a
+                      href={result.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 bg-gradient-to-r from-cosmic-pink to-space-purple text-stellar-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105"
+                    >
+                      <Video className="w-5 h-5" />
+                      Open in New Tab
+                    </a>
+                  </div>
                 </div>
               ) : (
                 <div className="mt-6 p-6 bg-nebula-gray/30 rounded-xl text-center">
-                  <Loader2 className="w-8 h-8 text-electric-blue animate-spin mx-auto mb-3" />
                   <p className="text-stellar-white/70">
-                    Your cosmic video is being generated in the digital void...
+                    Video generation completed but no video file was returned.
                   </p>
                 </div>
               )}
@@ -160,7 +194,7 @@ export default function Home() {
           <p className="text-sm">
             Powered by{' '}
             <span className="text-electric-blue font-semibold">Google Gemini Veo</span>
-            {' '}• Designed with cosmic inspiration
+            {' '}• Built with passion for creative technology
           </p>
         </div>
       </div>
